@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Crapless Craps Analyzer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html {
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a1f1a 0%, #051410 100%);
+            color: #fff;
+            padding: 12px;
+            min-height: 100vh;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+        @media (min-width: 768px) {
+            body { padding: 20px; }
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(251, 191, 36, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            position: relative;
+            z-index: 1;
+        }
+        h1 { 
+            text-align: center; 
+            font-size: 24px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #10b981 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+        }
+        @media (min-width: 768px) {
+            h1 { font-size: 36px; margin-bottom: 10px; letter-spacing: 1px; }
+        }
+        .subtitle { 
+            text-align: center; 
+            color: #86efac; 
+            margin-bottom: 20px;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        @media (min-width: 768px) {
+            .subtitle { margin-bottom: 30px; font-size: 16px; letter-spacing: 2px; }
+        }
+
+        /* Info Buttons Section */
+        .info-buttons-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        @media (min-width: 600px) {
+            .info-buttons-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+        }
+
+        .info-button {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.4) 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #93c5fd;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        @media (min-width: 768px) {
+            .info-button {
+                font-size: 16px;
+                padding: 16px 20px;
+            }
+        }
+
+        .info-button:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.4) 0%, rgba(29, 78, 216, 0.5) 100%);
+        }
+        @media (hover: hover) {
+            .info-button:hover {
+                background: linear-gradient(135deg, rgba(37, 99, 235, 0.4) 0%, rgba(29, 78, 216, 0.5) 100%);
+                border-color: #60a5fa;
+                box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+                transform: translateY(-2px);
+            }
+        }
+
+        .info-button.active {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.4) 100%);
+            border-color: #10b981;
+            color: #86efac;
+        }
+
+        .info-button-icon {
+            font-size: 20px;
+        }
+        @media (min-width: 768px) {
+            .info-button-icon {
+                font-size: 24px;
+            }
+        }
+
+        .info-button-arrow {
+            margin-left: auto;
+            transition: transform 0.3s;
+            font-size: 12px;
+        }
+
+        .info-button.active .info-button-arrow {
+            transform: rotate(180deg);
+        }
+
+        .info-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.4) 0%, rgba(4, 47, 36, 0.6) 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        @media (min-width: 768px) {
+            .info-content {
+                border-radius: 16px;
+                margin-bottom: 24px;
+            }
+        }
+
+        .info-content.show {
+            max-height: 3000px;
+            transition: max-height 0.6s ease-in;
+        }
+
+        .info-content-inner {
+            padding: 16px;
+        }
+        @media (min-width: 768px) {
+            .info-content-inner {
+                padding: 24px;
+            }
+        }
+
+        .info-content h2 {
+            font-size: 18px;
+            color: #fde68a;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        @media (min-width: 768px) {
+            .info-content h2 {
+                font-size: 22px;
+                margin-bottom: 20px;
+                letter-spacing: 1px;
+            }
+        }
+
+        .info-content h3 {
+            font-size: 15px;
+            color: #86efac;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        @media (min-width: 768px) {
+            .info-content h3 {
+                font-size: 17px;
+                margin-top: 25px;
+                margin-bottom: 12px;
+            }
+        }
+
+        .info-content p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #d1fae5;
+            margin-bottom: 12px;
+        }
+        @media (min-width: 768px) {
+            .info-content p {
+                font-size: 14px;
+                line-height: 1.8;
+                margin-bottom: 15px;
+            }
+        }
+
+        .info-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .info-content li {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #d1fae5;
+            margin-bottom: 8px;
+        }
+        @media (min-width: 768px) {
+            .info-content li {
+                font-size: 14px;
+                line-height: 1.7;
+                margin-bottom: 10px;
+            }
+        }
+
+        .info-content strong {
+            color: #fbbf24;
+        }
+
+        .info-highlight {
+            background: rgba(251, 191, 36, 0.15);
+            border-left: 3px solid #fbbf24;
+            padding: 10px 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        @media (min-width: 768px) {
+            .info-highlight {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+        }
+
+        .info-step {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+            padding: 10px 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        @media (min-width: 768px) {
+            .info-step {
+                padding: 12px 15px;
+                margin: 15px 0;
+            }
+        }
+
+        .info-step-title {
+            font-weight: bold;
+            color: #93c5fd;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        @media (min-width: 768px) {
+            .info-step-title {
+                font-size: 15px;
+            }
+        }
+        
+        .dice-icon {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 6px;
+            position: relative;
+            margin: 0 6px;
+            animation: rollDice 3s infinite ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            vertical-align: middle;
+        }
+        @media (min-width: 768px) {
+            .dice-icon { width: 40px; height: 40px; border-radius: 8px; margin: 0 10px; }
+        }
+        .dice-icon .dot {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .dice-icon .dot { width: 8px; height: 8px; }
+        }
+        
+        .dice-face-1 .dot:nth-child(1) { display: block; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dice-face-2 .dot:nth-child(1) { display: block; top: 8px; left: 8px; }
+        .dice-face-2 .dot:nth-child(2) { display: block; bottom: 8px; right: 8px; }
+        .dice-face-3 .dot:nth-child(1) { display: block; top: 8px; left: 8px; }
+        .dice-face-3 .dot:nth-child(2) { display: block; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dice-face-3 .dot:nth-child(3) { display: block; bottom: 8px; right: 8px; }
+        .dice-face-4 .dot:nth-child(1) { display: block; top: 8px; left: 8px; }
+        .dice-face-4 .dot:nth-child(2) { display: block; top: 8px; right: 8px; }
+        .dice-face-4 .dot:nth-child(3) { display: block; bottom: 8px; left: 8px; }
+        .dice-face-4 .dot:nth-child(4) { display: block; bottom: 8px; right: 8px; }
+        .dice-face-5 .dot:nth-child(1) { display: block; top: 8px; left: 8px; }
+        .dice-face-5 .dot:nth-child(2) { display: block; top: 8px; right: 8px; }
+        .dice-face-5 .dot:nth-child(3) { display: block; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dice-face-5 .dot:nth-child(4) { display: block; bottom: 8px; left: 8px; }
+        .dice-face-5 .dot:nth-child(5) { display: block; bottom: 8px; right: 8px; }
+        .dice-face-6 .dot:nth-child(1) { display: block; top: 8px; left: 8px; }
+        .dice-face-6 .dot:nth-child(2) { display: block; top: 50%; left: 8px; transform: translateY(-50%); }
+        .dice-face-6 .dot:nth-child(3) { display: block; bottom: 8px; left: 8px; }
+        .dice-face-6 .dot:nth-child(4) { display: block; top: 8px; right: 8px; }
+        .dice-face-6 .dot:nth-child(5) { display: block; top: 50%; right: 8px; transform: translateY(-50%); }
+        .dice-face-6 .dot:nth-child(6) { display: block; bottom: 8px; right: 8px; }
+        
+        .dice-small {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-radius: 4px;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @media (min-width: 768px) {
+            .dice-small { width: 24px; height: 24px; }
+        }
+        .dice-small .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #000;
+            border-radius: 50%;
+        }
+        @media (min-width: 768px) {
+            .dice-small .dot { width: 4px; height: 4px; }
+        }
+        
+        .dice-1 .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dice-2 .dot:nth-child(1) { top: 4px; left: 4px; }
+        .dice-2 .dot:nth-child(2) { bottom: 4px; right: 4px; }
+        .dice-3 .dot:nth-child(1) { top: 4px; left: 4px; }
+        .dice-3 .dot:nth-child(2) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dice-3 .dot:nth-child(3) { bottom: 4px; right: 4px; }
+        .dice-4 .dot:nth-child(1) { top: 4px; left: 4px; }
+        .dice-4 .dot:nth-child(2) { top: 4px; right: 4px; }
+        .dice-4 .dot:nth-child(3) { bottom: 4px; left: 4px; }
+        .dice-4 .dot:nth-child(4) { bottom: 4px; right: 4px; }
+        .dice-5 .dot:nth-child(1) { top: 4px; left: 4px; }
+        .dice-5 .dot:nth-child(2) { top: 4px; right: 4px; }
+        .dice-5 .dot:nth-child(3) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dice-5 .dot:nth-child(4) { bottom: 4px; left: 4px; }
+        .dice-5 .dot:nth-child(5) { bottom: 4px; right: 4px; }
+        .dice-6 .dot:nth-child(1) { top: 4px; left: 4px; }
+        .dice-6 .dot:nth-child(2) { top: 50%; left: 4px; transform: translateY(-50%); }
+        .dice-6 .dot:nth-child(3) { bottom: 4px; left: 4px; }
+        .dice-6 .dot:nth-child(4) { top: 4px; right: 4px; }
+        .dice-6 .dot:nth-child(5) { top: 50%; right: 4px; transform: translateY(-50%); }
+        .dice-6 .dot:nth-child(6) { bottom: 4px; right: 4px; }
+        
+        @keyframes rollDice {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+        }
+        
+        .card { 
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.4) 0%, rgba(4, 47, 36, 0.6) 100%);
+            border: 2px solid #10b981; 
+            border-radius: 12px; 
+            padding: 16px; 
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(16, 185, 129, 0.1) inset;
+            transition: transform 0.2s, box-shadow 0.2s;
+            backdrop-filter: blur(10px);
+        }
+        @media (min-width: 768px) {
+            .card { border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+        @media (hover: none) {
+            .card:hover { transform: none; }
+        }
+        
+        .instruction-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 78, 59, 0.3) 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
+        }
+        
+        .card-header { 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-bottom: 12px; 
+            color: #86efac;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        @media (min-width: 768px) {
+            .card-header { font-size: 20px; margin-bottom: 15px; gap: 10px; }
+        }
+        
+        .section-instruction {
+            font-size: 12px;
+            color: #86efac;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            padding: 10px 12px;
+            background: rgba(16, 185, 129, 0.08);
+            border-left: 3px solid #10b981;
+            border-radius: 4px;
+        }
+        @media (min-width: 768px) {
+            .section-instruction { font-size: 13px; margin-bottom: 15px; line-height: 1.6; padding: 10px 15px; }
+        }
+        
+        .input-group { margin-bottom: 12px; }
+        @media (min-width: 768px) {
+            .input-group { margin-bottom: 15px; }
+        }
+        
+        .input-group label { 
+            display: block; 
+            font-size: 13px; 
+            font-weight: 600; 
+            margin-bottom: 5px;
+            color: #d1fae5;
+        }
+        @media (min-width: 768px) {
+            .input-group label { font-size: 14px; }
+        }
+        
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            background: rgba(6, 78, 59, 0.6);
+            border: 2px solid #10b981; 
+            border-radius: 8px; 
+            color: #fff; 
+            font-size: 16px;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #34d399;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+        
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #000; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 15px; 
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            -webkit-tap-highlight-color: rgba(251, 191, 36, 0.3);
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            position: relative;
+        }
+        @media (min-width: 768px) {
+            button { padding: 16px; font-size: 18px; letter-spacing: 1px; }
+        }
+        
+        button:active {
+            transform: scale(0.95);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+        }
+        @media (hover: hover) {
+            button:hover { 
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+            }
+        }
+        
+        button:disabled { 
+            background: #6b7280; 
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(10, 1fr); gap: 12px; } }
+        
+        .bet-box { 
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.6) 0%, rgba(17, 24, 39, 0.8) 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 8px; 
+            padding: 10px 8px; 
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        @media (min-width: 768px) {
+            .bet-box { border-radius: 10px; padding: 12px; min-height: auto; }
+        }
+        
+        .bet-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bet-box:hover::before {
+            opacity: 1;
+        }
+        .bet-box:hover {
+            transform: scale(1.05);
+            border-color: #60a5fa;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        @media (hover: none) {
+            .bet-box:hover { transform: none; }
+        }
+        
+        .bet-number { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #93c5fd;
+            text-shadow: 0 0 10px rgba(147, 197, 253, 0.5);
+        }
+        @media (min-width: 768px) {
+            .bet-number { font-size: 22px; }
+        }
+        
+        .bet-amount { font-size: 15px; font-weight: bold; margin: 4px 0; color: #fff; }
+        @media (min-width: 768px) {
+            .bet-amount { font-size: 18px; margin: 5px 0; }
+        }
+        
+        .bet-type { font-size: 10px; color: #93c5fd; text-transform: uppercase; }
+        @media (min-width: 768px) {
+            .bet-type { font-size: 11px; }
+        }
+        
+        .bet-profit { font-size: 13px; font-weight: bold; color: #86efac; }
+        @media (min-width: 768px) {
+            .bet-profit { font-size: 15px; }
+        }
+        
+        .optimal-card { 
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.3) 0%, rgba(180, 83, 9, 0.4) 100%);
+            border: 2px solid #fbbf24; 
+            border-radius: 12px; 
+            padding: 16px; 
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3);
+        }
+        @media (min-width: 768px) {
+            .optimal-card { border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        }
+        
+        .optimal-header { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #fde68a; 
+            margin-bottom: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+        @media (min-width: 768px) {
+            .optimal-header { font-size: 24px; margin-bottom: 15px; letter-spacing: 2px; }
+        }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
+        
+        .stat-box { 
+            text-align: center;
+            padding: 12px 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(253, 230, 138, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        @media (min-width: 768px) {
+            .stat-box { padding: 15px; border-radius: 10px; }
+        }
+        
+        .stat-label { font-size: 11px; color: #fde68a; margin-bottom: 6px; text-transform: uppercase; }
+        @media (min-width: 768px) {
+            .stat-label { font-size: 13px; margin-bottom: 8px; }
+        }
+        
+        .stat-value { 
+            font-size: 22px; 
+            font-weight: bold;
+            background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        @media (min-width: 768px) {
+            .stat-value { font-size: 28px; }
+        }
+        
+        .purple-card { 
+            background: linear-gradient(135deg, rgba(88, 28, 135, 0.4) 0%, rgba(59, 7, 100, 0.5) 100%);
+            border: 2px solid #a855f7; 
+        }
+        .purple-header { color: #e9d5ff; }
+        
+        .input-flex { display: flex; gap: 8px; flex-direction: column; }
+        @media (min-width: 500px) {
+            .input-flex { flex-direction: row; gap: 10px; }
+            .input-flex input { flex: 1; }
+            .input-flex button { width: auto; padding: 14px 28px; }
+        }
+        
+        .analysis-result { 
+            background: rgba(59, 7, 100, 0.6);
+            border-radius: 8px; 
+            padding: 16px; 
+            margin-top: 12px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        @media (min-width: 768px) {
+            .analysis-result { border-radius: 10px; padding: 20px; margin-top: 15px; }
+        }
+        
+        .analysis-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px; }
+        @media (min-width: 768px) { .analysis-grid { grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; } }
+        
+        .fun-fact { 
+            background: linear-gradient(135deg, #7e22ce 0%, #db2777 100%); 
+            border: 2px solid #fbbf24; 
+            border-radius: 8px; 
+            padding: 14px; 
+            margin-top: 12px;
+            box-shadow: 0 4px 15px rgba(126, 34, 206, 0.4);
+        }
+        @media (min-width: 768px) {
+            .fun-fact { border-radius: 10px; padding: 18px; margin-top: 15px; }
+        }
+        
+        .fun-fact-header { 
+            font-size: 15px; 
+            font-weight: bold; 
+            color: #fde68a; 
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        @media (min-width: 768px) {
+            .fun-fact-header { font-size: 18px; margin-bottom: 10px; }
+        }
+        
+        .error { 
+            background: rgba(153, 27, 27, 0.6); 
+            border-radius: 8px; 
+            padding: 12px; 
+            color: #fca5a5;
+            border: 2px solid #ef4444;
+        }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        @media (min-width: 768px) {
+            table { font-size: 14px; }
+        }
+        
+        th, td { padding: 10px 6px; text-align: left; border-bottom: 1px solid #065f46; }
+        @media (min-width: 768px) {
+            th, td { padding: 12px; }
+        }
+        
+        th { 
+            color: #86efac; 
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+        @media (min-width: 768px) {
+            th { font-size: 12px; letter-spacing: 1px; }
+        }
+        
+        tr:hover { background: rgba(6, 78, 59, 0.4); }
+        
+        .insights { 
+            background: linear-gradient(135deg, rgba(153, 27, 27, 0.4) 0%, rgba(127, 29, 29, 0.5) 100%);
+            border: 2px solid #ef4444; 
+            border-radius: 12px; 
+            padding: 16px; 
+            margin-top: 16px;
+            box-shadow: 0 8px 32px rgba(239, 68, 68, 0.3);
+        }
+        @media (min-width: 768px) {
+            .insights { border-radius: 16px; padding: 24px; margin-top: 24px; }
+        }
+        
+        .insights h3 { 
+            color: #fca5a5; 
+            margin-bottom: 12px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        @media (min-width: 768px) {
+            .insights h3 { margin-bottom: 15px; font-size: 22px; letter-spacing: 1px; }
+        }
+        
+        .insights li { margin-bottom: 10px; line-height: 1.6; font-size: 13px; }
+        @media (min-width: 768px) {
+            .insights li { margin-bottom: 12px; line-height: 1.7; font-size: 14px; }
+        }
+        
+        .insights strong { color: #fde68a; }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+            color: #fbbf24;
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(251, 191, 36, 0.3);
+            border-top-color: #fbbf24;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        .press-settings {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        @media (min-width: 768px) {
+            .press-settings { padding: 15px; margin-top: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span class="dice-icon dice-face-1" id="dice1">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </span>
+            CRAPLESS CRAPS ANALYZER
+            <span class="dice-icon dice-face-6" id="dice2" style="animation-delay: -1.5s;">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </span>
+        </h1>
+        <p class="subtitle">Master The Odds • Maximize Profits</p>
+
+        <!-- INFO BUTTONS SECTION -->
+        <div class="info-buttons-container">
+            <div class="info-button" id="howToPlayBtn">
+                <span class="info-button-icon">🎲</span>
+                <span>How to Play Bubble Craps</span>
+                <span class="info-button-arrow">▼</span>
+            </div>
+            <div class="info-button" id="howToUseBtn">
+                <span class="info-button-icon">🎯</span>
+                <span>How to Use This Tool</span>
+                <span class="info-button-arrow">▼</span>
+            </div>
+        </div>
+
+        <!-- HOW TO PLAY CONTENT -->
+        <div class="info-content" id="howToPlayContent">
+            <div class="info-content-inner">
+                <h2>🎲 How to Play Bubble Crapless Craps on the Machine</h2>
+                
+                <p>Bubble Crapless Craps is an electronic version of the casino game where you bet on dice rolls without the pressure of a live table. Here's how to play:</p>
+
+                <h3>Getting Started:</h3>
+                <ul>
+                    <li>Insert cash or ticket into the machine</li>
+                    <li>The machine will credit your account</li>
+                    <li>Touch the screen to place bets on the virtual craps table</li>
+                </ul>
+
+                <div class="info-highlight">
+                    <strong>The Key Difference - No "Crapping Out":</strong><br>
+                    In regular craps, rolling 2, 3, or 12 on the come-out roll loses immediately. In Crapless Craps, ALL numbers (2, 3, 4, 5, 6, 8, 9, 10, 11, 12) become "point numbers" - you can win on any of them! However, only 7 loses (called "sevening out").
+                </div>
+
+                <h3>How to Bet:</h3>
+                <div class="info-step">
+                    <div class="info-step-title">Step 1: Place Your Bets</div>
+                    Touch the numbers you want to bet on (2-12, excluding 7)
+                </div>
+                <div class="info-step">
+                    <div class="info-step-title">Step 2: Select Amount</div>
+                    Choose your bet amount for each number
+                </div>
+                <div class="info-step">
+                    <div class="info-step-title">Step 3: Roll the Dice</div>
+                    Press the "Roll" button to shoot the virtual dice
+                </div>
+                <div class="info-step">
+                    <div class="info-step-title">Step 4: Win or Continue</div>
+                    If your number hits, you win! If a 7 rolls, you lose all bets and the round ends
+                </div>
+
+                <h3>Types of Bets:</h3>
+                <ul>
+                    <li><strong>PLACE bets (6 & 8):</strong> Pay 7-to-6 odds. These have the lowest house edge</li>
+                    <li><strong>BUY bets (2, 3, 4, 5, 9, 10, 11, 12):</strong> Pay true odds minus 5% commission. Higher payouts but higher house edge</li>
+                </ul>
+
+                <h3>Payout Examples:</h3>
+                <ul>
+                    <li>Bet $10 on 6 or 8 → Win $11.67</li>
+                    <li>Bet $10 on 4 or 10 → Win $19 (after 5% commission)</li>
+                    <li>Bet $10 on 2 or 12 → Win $57 (after 5% commission)</li>
+                </ul>
+
+                <div class="info-highlight">
+                    <strong>⚠️ The Catch:</strong><br>
+                    Rolling a 7 ends your session and you lose ALL active bets. This is why session length matters - the longer you play, the higher the chance of hitting that deadly 7.
+                </div>
+
+                <h3>Cashing Out:</h3>
+                <p>Press the "Cash Out" button at any time to print a ticket with your winnings. Take it to the cashier or insert it into another machine.</p>
+            </div>
+        </div>
+
+        <!-- HOW TO USE TOOL CONTENT -->
+        <div class="info-content" id="howToUseContent">
+            <div class="info-content-inner">
+                <h2>🎯 How to Use This Analyzer & Why It's Critical</h2>
+                
+                <p>This tool answers the most important question in Crapless Craps: <strong>"When should I walk away?"</strong></p>
+
+                <div class="info-highlight">
+                    <strong>Why This Tool Exists:</strong><br>
+                    Most players lose money at Crapless Craps because they play too long. The house edge is built into every roll, and the longer you play, the more likely you'll hit a 7 and lose everything. This analyzer uses 10,000 Monte Carlo simulations to find your <strong>optimal stopping point</strong> - the exact number of rolls where you have the BEST chance of hitting your profit target before sevening out.
+                </div>
+
+                <h3>How to Use It (4 Simple Steps):</h3>
+
+                <div class="info-step">
+                    <div class="info-step-title">Step 1: Set Your Bankroll</div>
+                    Enter how much money you're willing to bet per session<br>
+                    <em style="color: #93c5fd; font-size: 12px;">Example: $250 means you'll have $250 worth of bets on the table</em>
+                </div>
+
+                <div class="info-step">
+                    <div class="info-step-title">Step 2: Set Your Profit Target</div>
+                    Enter how much profit you want to make<br>
+                    <em style="color: #93c5fd; font-size: 12px;">Example: $100 means you want to turn $250 into $350</em>
+                </div>
+
+                <div class="info-step">
+                    <div class="info-step-title">Step 3: Choose Your Strategy</div>
+                    <ul style="margin-top: 8px;">
+                        <li><strong>Flat:</strong> Equal bets on all 10 numbers (simplest, recommended for beginners)</li>
+                        <li><strong>Weighted:</strong> More money on likely numbers like 6 and 8</li>
+                        <li><strong>Low Edge:</strong> 60% on 6/8, 40% on others (minimizes house edge)</li>
+                        <li><strong>Inside Only:</strong> Only bet on 4, 5, 6, 8, 9, 10 (reduces risk)</li>
+                        <li><strong>Press Profit:</strong> Automatically increases bets after wins (aggressive, high-risk/high-reward)</li>
+                        <li><strong>Custom:</strong> Enter your own bet amounts for each number</li>
+                    </ul>
+                </div>
+
+                <div class="info-step">
+                    <div class="info-step-title">Step 4: Run Simulations</div>
+                    Click "Run 10,000 Simulations" - The tool will simulate 10,000 sessions at different lengths (1-15 rolls) and tell you the OPTIMAL number of rolls to play
+                </div>
+
+                <h3>Understanding Your Results:</h3>
+                <p>The tool shows you:</p>
+                <ul>
+                    <li><strong>Win Rate:</strong> Your chance of hitting your profit target at each session length</li>
+                    <li><strong>Optimal Rolls:</strong> The exact number of rolls where your win rate is highest</li>
+                    <li><strong>Average Profit:</strong> What you'd make on average (usually negative due to house edge)</li>
+                    <li><strong>Seven Out %:</strong> How often you'd lose everything at each length</li>
+                </ul>
+
+                <div class="info-highlight">
+                    <strong>💡 The Key Insight:</strong><br>
+                    You'll discover that playing just 2-3 rolls gives you the BEST chance of winning. Playing 10+ rolls dramatically increases your chance of sevening out and losing everything.
+                </div>
+
+                <h3>Bonus Feature - Post-Session Analysis:</h3>
+                <p>After playing, enter the actual rolls you got (e.g., "6,8,4,11,6") to see:</p>
+                <ul>
+                    <li>How much profit you actually made</li>
+                    <li>How rare your roll sequence was (compared to things like lightning strikes or hole-in-ones)</li>
+                    <li>Whether you beat the odds or got unlucky</li>
+                </ul>
+
+                <h3>Why This Matters:</h3>
+                <p>Without this tool, you're gambling blind. With it, you're making data-driven decisions about when to walk away. The house edge is unavoidable, but smart session management can dramatically improve your odds of leaving with a profit.</p>
+
+                <div class="info-highlight">
+                    <strong>🎯 Pro Tip:</strong><br>
+                    Set a hard rule: cash out after your optimal number of rolls, even if you're winning. Discipline beats luck every time.
+                </div>
+            </div>
+        </div>
+
+        <div class="card instruction-card">
+            <div class="card-header" style="color: #fde68a; font-size: 18px; justify-content: center;">
+                <span class="dice-small dice-1"><span class="dot"></span></span> QUICK START
+            </div>
+            <p style="line-height: 1.7; font-size: 13px; color: #d1fae5; text-align: center;">
+                This analyzer runs <strong>10,000 Monte Carlo simulations</strong> to determine the <strong style="color: #fbbf24;">optimal number of rolls</strong> 
+                you should play before cashing out in Crapless Craps. Set your bankroll, choose a betting strategy, 
+                and discover exactly when to walk away to maximize your chances of hitting your profit target. 
+                The <strong style="color: #fbbf24;">Press Profit</strong> strategy automatically increases bets after wins to accelerate toward your goal.
+                After playing, use the Post-Session Analysis to see how your actual rolls performed and how rare they were.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="dice-small dice-2"><span class="dot"></span><span class="dot"></span></span> SESSION SETUP
+            </div>
+            <div class="section-instruction">
+                Set your session bankroll, target profit goal, and choose a betting strategy. The strategy determines how your bankroll is distributed across the 10 numbers (2-12). Click 'Run Simulations' to find the optimal number of rolls before cashing out.
+            </div>
+            <div class="input-group">
+                <label>💰 Total Bankroll Per Session ($)</label>
+                <input type="number" id="bankroll" value="250" min="50" step="50">
+            </div>
+            <div class="input-group">
+                <label>🎯 Target Profit ($)</label>
+                <input type="number" id="targetProfit" value="100" min="10" step="10">
+            </div>
+            <div class="input-group">
+                <label>📊 Betting Strategy</label>
+                <select id="strategy">
+                    <option value="flat">Flat - Equal on all 10 numbers</option>
+                    <option value="weighted">Weighted - More on likely numbers (6/8)</option>
+                    <option value="lowEdge">Low Edge - 60% on 6/8, 40% on others</option>
+                    <option value="insideOnly">Inside Only - Only 4,5,6,8,9,10</option>
+                    <option value="pressProfit">Press Profit - Increase bets after wins 📈</option>
+                    <option value="custom">Customize Your Own</option>
+                </select>
+            </div>
+            
+            <div id="pressProfitSection" class="press-settings hidden">
+                <div class="card-header" style="margin-top: 0; font-size: 14px; color: #fde68a;">
+                    🚀 PRESS PROFIT SETTINGS
+                </div>
+                <div class="section-instruction" style="background: rgba(16, 185, 129, 0.1); border-color: #10b981;">
+                    After each winning roll, this strategy increases your bet on that number by the specified percentage, reinvesting profits to reach your target faster. Higher press percentages mean faster growth but higher risk.
+                </div>
+                <div class="input-group">
+                    <label>Press Percentage (% of profit to reinvest)</label>
+                    <input type="number" id="pressPercent" value="50" min="25" max="100" step="25">
+                    <div style="font-size: 11px; color: #86efac; margin-top: 5px;">
+                        25% = Conservative | 50% = Balanced | 75% = Aggressive | 100% = Max Risk
+                    </div>
+                </div>
+            </div>
+
+            <div id="customBetsSection" class="hidden">
+                <div class="card-header" style="margin-top: 15px; font-size: 14px;">
+                    <span class="dice-small"></span> ENTER YOUR CUSTOM BETS
+                </div>
+                <div class="section-instruction">
+                    Enter the exact dollar amount you want to bet on each number. The total of all your custom bets will be calculated below. Use increments of $5 for easier chip management at the table.
+                </div>
+                <div class="grid" style="margin-bottom: 15px;">
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">2</label>
+                        <input type="number" id="custom2" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">3</label>
+                        <input type="number" id="custom3" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">4</label>
+                        <input type="number" id="custom4" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">5</label>
+                        <input type="number" id="custom5" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">6</label>
+                        <input type="number" id="custom6" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">8</label>
+                        <input type="number" id="custom8" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">9</label>
+                        <input type="number" id="custom9" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">10</label>
+                        <input type="number" id="custom10" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">11</label>
+                        <input type="number" id="custom11" value="0" min="0" step="5">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">12</label>
+                        <input type="number" id="custom12" value="0" min="0" step="5">
+                    </div>
+                </div>
+                <div style="text-align: center; font-size: 18px; font-weight: bold; color: #fde68a;">
+                    Total Custom Bets: $<span id="customTotal">0</span>
+                </div>
+            </div>
+            <button id="runSimBtn" type="button">🎲 RUN 10,000 SIMULATIONS</button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="dice-small dice-3"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span> CURRENT BET DISTRIBUTION (<span id="totalBankroll">$250</span> TOTAL)
+            </div>
+            <div class="section-instruction">
+                This shows your bet allocation across all 10 numbers. Each box displays: the number, your bet amount, bet type (PLACE or BUY), and the profit you'd make if that number hits. <strong style="color: #fbbf24;">For Press Profit strategy, these are your STARTING bets</strong> - they will increase after each win.
+            </div>
+            <div class="grid" id="betGrid"></div>
+        </div>
+
+        <div id="loadingSection" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Running 10,000 simulations...</p>
+        </div>
+
+        <div id="optimalSection"></div>
+        <div id="resultsSection"></div>
+
+        <div class="card purple-card">
+            <div class="card-header purple-header">
+                <span class="dice-small dice-4" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span> POST-SESSION ANALYSIS
+            </div>
+            <p style="font-size: 13px; color: #e9d5ff; margin-bottom: 10px;">
+                Enter the rolls you just had (excluding 7s). Example: 6,8,4,11,6
+            </p>
+            <div class="section-instruction" style="background: rgba(168, 85, 247, 0.1); border-color: #a855f7; color: #c4b5fd;">
+                After playing, enter the numbers that rolled (comma-separated, no 7s). This will calculate your actual profit and show how rare your sequence was compared to everyday events. If you used Press Profit, select it in the strategy dropdown above first.
+            </div>
+            <div class="input-flex">
+                <input type="text" id="historicalRolls" placeholder="e.g., 6,8,4,11,6,3,12">
+                <button id="analyzeBtn" type="button" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); color: #fff;">ANALYZE</button>
+            </div>
+            <div id="analysisResult"></div>
+        </div>
+
+        <div class="insights">
+            <h3><span class="dice-small dice-5" style="background: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span> STRATEGY INSIGHTS</h3>
+            <ul>
+                <li><strong>Flat vs Weighted:</strong> Results are very similar! The house edge is consistent regardless of distribution.</li>
+                <li><strong>Low Edge Focus (60% on 6/8):</strong> Slightly reduces overall house edge but limits big hit potential.</li>
+                <li><strong>Inside Only:</strong> Lower total risk, but misses the big payouts from 2/3/11/12 hitting.</li>
+                <li><strong>Press Profit:</strong> Accelerates gains when on a hot streak but increases risk exponentially. Great for aggressive play but can lead to bigger losses when variance turns.</li>
+                <li><strong>The Truth:</strong> Bet distribution matters LESS than session length. Stop at 2-3 rolls regardless of strategy!</li>
+                <li><strong>Recommendation:</strong> Use FLAT betting for simplicity - easier to manage, virtually identical results. Use Press Profit only if you're feeling lucky and can afford the risk!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const strategyData = {
+            2:  {ways: 1, type: 'buy', trueOdds: 6.0, placePayout: 5.5},
+            3:  {ways: 2, type: 'buy', trueOdds: 3.0, placePayout: 2.75},
+            4:  {ways: 3, type: 'buy', trueOdds: 2.0, placePayout: 1.8},
+            5:  {ways: 4, type: 'buy', trueOdds: 1.5, placePayout: 1.4},
+            6:  {ways: 5, type: 'place', trueOdds: 1.2, placePayout: 7/6},
+            8:  {ways: 5, type: 'place', trueOdds: 1.2, placePayout: 7/6},
+            9:  {ways: 4, type: 'buy', trueOdds: 1.5, placePayout: 1.4},
+            10: {ways: 3, type: 'buy', trueOdds: 2.0, placePayout: 1.8},
+            11: {ways: 2, type: 'buy', trueOdds: 3.0, placePayout: 2.75},
+            12: {ways: 1, type: 'buy', trueOdds: 6.0, placePayout: 5.5},
+        };
+
+        const funFacts = [
+            { odds: 1/15300, description: "getting struck by lightning in your lifetime" },
+            { odds: 1/12500, description: "hitting a hole-in-one in golf" },
+            { odds: 1/649740, description: "getting a royal flush in poker" },
+            { odds: 1/1024, description: "flipping heads 10 times in a row" },
+            { odds: 1/216, description: "rolling three dice and getting all sixes" },
+            { odds: 1/1000, description: "finding a four-leaf clover" },
+            { odds: 1/292201338, description: "winning the Powerball jackpot" },
+            { odds: 1/128, description: "flipping heads 7 times in a row" },
+            { odds: 1/50, description: "an IRS audit" },
+        ];
+
+        // Info button toggle functionality
+        function toggleInfoSection(buttonId, contentId) {
+            const button = document.getElementById(buttonId);
+            const content = document.getElementById(contentId);
+            const otherButtonId = buttonId === 'howToPlayBtn' ? 'howToUseBtn' : 'howToPlayBtn';
+            const otherContentId = contentId === 'howToPlayContent' ? 'howToUseContent' : 'howToPlayContent';
+            const otherButton = document.getElementById(otherButtonId);
+            const otherContent = document.getElementById(otherContentId);
+
+            // Close other section if open
+            if (otherContent.classList.contains('show')) {
+                otherContent.classList.remove('show');
+                otherButton.classList.remove('active');
+            }
+
+            // Toggle current section
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                button.classList.remove('active');
+            } else {
+                content.classList.add('show');
+                button.classList.add('active');
+                // Smooth scroll to content
+                setTimeout(() => {
+                    content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        }
+
+        function calculateBets(bankroll, strategy) {
+            const bets = {};
+            const nums = [2,3,4,5,6,8,9,10,11,12];
+
+            if (strategy === 'flat' || strategy === 'pressProfit') {
+                const bet = bankroll / 10;
+                nums.forEach(n => bets[n] = bet);
+            } else if (strategy === 'weighted') {
+                const totalWays = nums.reduce((s, n) => s + strategyData[n].ways, 0);
+                nums.forEach(n => bets[n] = bankroll * (strategyData[n].ways / totalWays));
+            } else if (strategy === 'lowEdge') {
+                [6, 8].forEach(n => bets[n] = bankroll * 0.3);
+                [2,3,4,5,9,10,11,12].forEach(n => bets[n] = bankroll * 0.05);
+            } else if (strategy === 'insideOnly') {
+                const bet = bankroll / 6;
+                [4,5,6,8,9,10].forEach(n => bets[n] = bet);
+                [2,3,11,12].forEach(n => bets[n] = 0);
+            } else if (strategy === 'custom') {
+                nums.forEach(n => {
+                    bets[n] = parseFloat(document.getElementById(`custom${n}`).value) || 0;
+                });
+            }
+            return bets;
+        }
+
+        function calculateWin(num, amount) {
+            const data = strategyData[num];
+            if (data.type === 'place') {
+                return amount * data.placePayout;
+            } else {
+                const gross = amount * data.trueOdds;
+                return gross - (gross * 0.05);
+            }
+        }
+
+        function updateCustomTotal() {
+            const nums = [2,3,4,5,6,8,9,10,11,12];
+            let total = 0;
+            nums.forEach(n => {
+                total += parseFloat(document.getElementById(`custom${n}`).value) || 0;
+            });
+            document.getElementById('customTotal').textContent = total.toFixed(2);
+            updateBetDisplay();
+        }
+
+        function toggleCustomBets() {
+            const strategy = document.getElementById('strategy').value;
+            const customSection = document.getElementById('customBetsSection');
+            const pressProfitSection = document.getElementById('pressProfitSection');
+            
+            if (strategy === 'custom') {
+                customSection.classList.remove('hidden');
+            } else {
+                customSection.classList.add('hidden');
+            }
+            
+            if (strategy === 'pressProfit') {
+                pressProfitSection.classList.remove('hidden');
+            } else {
+                pressProfitSection.classList.add('hidden');
+            }
+            
+            updateBetDisplay();
+        }
+
+        function updateBetDisplay() {
+            const bankroll = parseFloat(document.getElementById('bankroll').value);
+            const strategy = document.getElementById('strategy').value;
+            const bets = calculateBets(bankroll, strategy);
+            
+            let totalBets = Object.values(bets).reduce((sum, bet) => sum + bet, 0);
+            document.getElementById('totalBankroll').textContent = `$${totalBets.toFixed(0)}`;
+            
+            let html = '';
+            [2,3,4,5,6,8,9,10,11,12].forEach(num => {
+                const bet = bets[num];
+                const profit = bet > 0 ? calculateWin(num, bet) : 0;
+                html += `
+                    <div class="bet-box">
+                        <div class="bet-number">${num}</div>
+                        <div class="bet-amount">$${bet.toFixed(0)}</div>
+                        <div class="bet-type">${strategyData[num].type.toUpperCase()}</div>
+                        <div class="bet-profit">+$${profit.toFixed(0)}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('betGrid').innerHTML = html;
+        }
+
+        function simulateSession(rolls, bets, usePressing = false, pressPercent = 50) {
+            let profit = 0;
+            const total = Object.values(bets).reduce((s, b) => s + b, 0);
+            
+            const currentBets = {};
+            Object.keys(bets).forEach(k => currentBets[k] = bets[k]);
+            
+            for (let i = 0; i < rolls; i++) {
+                const roll = Math.floor(Math.random() * 36);
+                
+                if (roll < 6) {
+                    profit -= total;
+                    if (usePressing) {
+                        const currentTotal = Object.values(currentBets).reduce((s, b) => s + b, 0);
+                        profit -= (currentTotal - total);
+                    }
+                    break;
+                }
+                
+                let cum = 6;
+                for (let n of [2,3,4,5,6,8,9,10,11,12]) {
+                    cum += strategyData[n].ways;
+                    if (roll < cum) {
+                        if (currentBets[n] > 0) {
+                            const winAmount = calculateWin(n, currentBets[n]);
+                            profit += winAmount;
+                            
+                            if (usePressing) {
+                                const pressAmount = winAmount * (pressPercent / 100);
+                                currentBets[n] += pressAmount;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            return profit;
+        }
+
+        let isProcessing = false;
+        
+        function runSimulation() {
+            console.log('Running simulation...');
+            const bankroll = parseFloat(document.getElementById('bankroll').value);
+            const target = parseFloat(document.getElementById('targetProfit').value);
+            const strategy = document.getElementById('strategy').value;
+            const bets = calculateBets(bankroll, strategy);
+            const usePressing = strategy === 'pressProfit';
+            const pressPercent = usePressing ? parseFloat(document.getElementById('pressPercent').value) : 50;
+            
+            if (!bankroll || !target || bankroll < 50) {
+                alert('Please enter valid bankroll and target profit values.');
+                isProcessing = false;
+                return;
+            }
+            
+            document.getElementById('loadingSection').classList.add('show');
+            document.getElementById('optimalSection').innerHTML = '';
+            document.getElementById('resultsSection').innerHTML = '';
+            
+            setTimeout(() => {
+                document.getElementById('loadingSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            
+            setTimeout(() => {
+                const results = [];
+                for (let sessionLen = 1; sessionLen <= 15; sessionLen++) {
+                    let wins = 0, totalProfit = 0, sevens = 0;
+                    const profits = [];
+                    
+                    for (let i = 0; i < 10000; i++) {
+                        const p = simulateSession(sessionLen, bets, usePressing, pressPercent);
+                        totalProfit += p;
+                        profits.push(p);
+                        if (p >= target) wins++;
+                        if (p < 0) sevens++;
+                    }
+                    
+                    profits.sort((a, b) => a - b);
+                    results.push({
+                        rolls: sessionLen,
+                        winRate: ((wins / 10000) * 100).toFixed(1),
+                        avgProfit: (totalProfit / 10000).toFixed(2),
+                        median: profits[5000].toFixed(2),
+                        sevenOut: ((sevens / 10000) * 100).toFixed(1),
+                        completion: (((10000 - sevens) / 10000) * 100).toFixed(1)
+                    });
+                }
+                
+                displayResults(results, usePressing);
+                
+                document.getElementById('loadingSection').classList.remove('show');
+                
+                setTimeout(() => {
+                    document.getElementById('optimalSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+                isProcessing = false;
+            }, 1000);
+        }
+
+        function displayResults(results, isPressing = false) {
+            const optimal = results.reduce((best, r) => 
+                parseFloat(r.winRate) > parseFloat(best.winRate) ? r : best
+            );
+            
+            const strategyNote = isPressing ? 
+                '<div style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; border-radius: 8px; padding: 12px; margin-top: 15px; text-align: center;"><strong style="color: #fde68a;">📈 Press Profit Active:</strong> <span style="color: #86efac;">Bets increase after each win, accelerating profit potential but also increasing risk.</span></div>' : 
+                '';
+            
+            document.getElementById('optimalSection').innerHTML = `
+                <div class="optimal-card">
+                    <div class="optimal-header">🏆 OPTIMAL SESSION: ${optimal.rolls} ROLLS</div>
+                    <div class="section-instruction" style="background: rgba(0, 0, 0, 0.2); border-color: #fbbf24; color: #fde68a; text-align: center; margin-bottom: 20px;">
+                        Based on 10,000 simulations, this is the ideal number of rolls to play before walking away to maximize your chance of hitting your target profit.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Win Rate</div>
+                            <div class="stat-value">${optimal.winRate}%</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Avg Profit</div>
+                            <div class="stat-value">$${optimal.avgProfit}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Median Profit</div>
+                            <div class="stat-value">$${optimal.median}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Completion</div>
+                            <div class="stat-value">${optimal.completion}%</div>
+                        </div>
+                    </div>
+                    ${strategyNote}
+                </div>
+            `;
+            
+            let tableHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        📊 DETAILED RESULTS (10,000 SIMULATIONS PER SESSION LENGTH)
+                    </div>
+                    <div class="section-instruction">
+                        Complete breakdown showing win rates and average profits for different session lengths. The highlighted row shows your optimal stopping point. 'Seven Out %' shows how often you'd lose everything at that length.
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rolls</th>
+                                    <th>Win Rate</th>
+                                    <th>Avg Profit</th>
+                                    <th>Median</th>
+                                    <th>Seven Out %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            results.forEach(r => {
+                const highlight = r.rolls === optimal.rolls ? 'background: rgba(217, 119, 6, 0.3); border-left: 4px solid #fbbf24;' : '';
+                tableHTML += `
+                    <tr style="${highlight}">
+                        <td><strong>${r.rolls}</strong></td>
+                        <td><strong style="color: #86efac;">${r.winRate}%</strong></td>
+                        <td style="color: ${parseFloat(r.avgProfit) > 0 ? '#86efac' : '#fca5a5'}; font-weight: bold;">$${r.avgProfit}</td>
+                        <td>$${r.median}</td>
+                        <td style="color: #fca5a5;">${r.sevenOut}%</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += '</tbody></table></div></div>';
+            document.getElementById('resultsSection').innerHTML = tableHTML;
+        }
+
+        function analyzeRolls() {
+            if (isProcessing) return;
+            isProcessing = true;
+            
+            console.log('Analyzing rolls...');
+            const input = document.getElementById('historicalRolls').value;
+            const rolls = input.split(',').map(r => parseInt(r.trim())).filter(r => r >= 2 && r <= 12 && r !== 7);
+            
+            if (rolls.length === 0) {
+                document.getElementById('analysisResult').innerHTML = 
+                    '<div class="error">⚠️ Please enter valid rolls (2-12, excluding 7)</div>';
+                isProcessing = false;
+                return;
+            }
+            
+            const bankroll = parseFloat(document.getElementById('bankroll').value);
+            const strategy = document.getElementById('strategy').value;
+            const bets = calculateBets(bankroll, strategy);
+            const usePressing = strategy === 'pressProfit';
+            const pressPercent = usePressing ? parseFloat(document.getElementById('pressPercent').value) : 50;
+            
+            const currentBets = {};
+            Object.keys(bets).forEach(k => currentBets[k] = bets[k]);
+            
+            let prob = 1;
+            let totalProfit = 0;
+            let rollDetails = [];
+            
+            rolls.forEach((r, index) => {
+                prob *= strategyData[r].ways / 36;
+                
+                if (currentBets[r] > 0) {
+                    const winAmount = calculateWin(r, currentBets[r]);
+                    totalProfit += winAmount;
+                    
+                    rollDetails.push({
+                        roll: r,
+                        bet: currentBets[r],
+                        win: winAmount
+                    });
+                    
+                    if (usePressing && index < rolls.length - 1) {
+                        const pressAmount = winAmount * (pressPercent / 100);
+                        currentBets[r] += pressAmount;
+                    }
+                }
+            });
+            
+            const odds = 1 / prob;
+            const sorted = [...funFacts].sort((a, b) => 
+                Math.abs(Math.log(a.odds) - Math.log(prob)) - Math.abs(Math.log(b.odds) - Math.log(prob))
+            );
+            const fact = sorted[0];
+            const comp = prob > fact.odds ? "LESS" : "MORE";
+            
+            let rollDetailsHTML = '';
+            if (usePressing && rollDetails.length > 0) {
+                rollDetailsHTML = `
+                    <div style="border-top: 1px solid #7e22ce; padding-top: 15px; margin-top: 15px;">
+                        <div style="font-size: 12px; color: #e9d5ff; margin-bottom: 10px; font-weight: bold;">📈 PRESS PROFIT BREAKDOWN:</div>
+                        <div style="font-size: 11px; color: #c4b5fd; line-height: 1.6;">
+                            ${rollDetails.map((detail, i) => 
+                                `Roll ${i+1} (${detail.roll}): $${detail.bet.toFixed(2)} bet → $${detail.win.toFixed(2)} profit`
+                            ).join('<br>')}
+                        </div>
+                        <div style="font-size: 12px; color: #fde68a; margin-top: 8px;">
+                            Your bets grew from $${bets[rolls[0]].toFixed(2)} to $${currentBets[rolls[rolls.length-1]].toFixed(2)} through pressing!
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('analysisResult').innerHTML = `
+                <div class="analysis-result">
+                    <div class="analysis-grid">
+                        <div>
+                            <div style="font-size: 12px; color: #e9d5ff; margin-bottom: 5px;">Your Roll Sequence</div>
+                            <div style="font-size: 18px; font-weight: bold;">${rolls.join(' → ')}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #e9d5ff; margin-bottom: 5px;">Total Profit</div>
+                            <div style="font-size: 18px; font-weight: bold; color: #86efac;">$${totalProfit.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    ${rollDetailsHTML}
+                    <div style="border-top: 1px solid #7e22ce; padding-top: 15px; margin-top: 15px;">
+                        <div style="font-size: 12px; color: #e9d5ff; margin-bottom: 5px;">Probability of This Sequence</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #fde68a;">${(prob * 100).toFixed(6)}%</div>
+                        <div style="font-size: 16px; font-weight: 600; color: #e9d5ff;">1 in ${odds.toFixed(0)}</div>
+                    </div>
+                    <div class="fun-fact">
+                        <div class="fun-fact-header">🎲 FUN FACT COMPARISON</div>
+                        <p style="font-size: 14px; line-height: 1.5;">
+                            Your roll sequence was <strong style="color: #fde68a;">${comp} LIKELY</strong> than 
+                            <strong style="color: #fbb6ce;">${fact.description}</strong>!
+                        </p>
+                        <p style="font-size: 12px; color: #e9d5ff; margin-top: 8px;">
+                            (${fact.description}: 1 in ${(1 / fact.odds).toFixed(0)})
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => { isProcessing = false; }, 300);
+        }
+
+        function setupButton(buttonId, handler) {
+            const button = document.getElementById(buttonId);
+            if (!button) {
+                console.error('Button not found:', buttonId);
+                return;
+            }
+            
+            let touchHandled = false;
+            
+            button.addEventListener('touchstart', function(e) {
+                touchHandled = true;
+            }, { passive: true });
+            
+            button.addEventListener('click', function(e) {
+                if (touchHandled) {
+                    touchHandled = false;
+                    setTimeout(() => { touchHandled = false; }, 500);
+                }
+                handler();
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            
+            const bankrollInput = document.getElementById('bankroll');
+            const strategySelect = document.getElementById('strategy');
+            const pressPct = document.getElementById('pressPercent');
+            
+            if (bankrollInput) {
+                bankrollInput.addEventListener('change', updateBetDisplay);
+                bankrollInput.addEventListener('input', updateBetDisplay);
+            }
+            
+            if (strategySelect) {
+                strategySelect.addEventListener('change', toggleCustomBets);
+            }
+            
+            if (pressPct) {
+                pressPct.addEventListener('change', updateBetDisplay);
+                pressPct.addEventListener('input', updateBetDisplay);
+            }
+            
+            const customInputs = [2,3,4,5,6,8,9,10,11,12];
+            customInputs.forEach(num => {
+                const input = document.getElementById('custom' + num);
+                if (input) {
+                    input.addEventListener('change', updateCustomTotal);
+                    input.addEventListener('input', updateCustomTotal);
+                }
+            });
+            
+            setupButton('runSimBtn', runSimulation);
+            setupButton('analyzeBtn', analyzeRolls);
+            
+            // Setup info buttons
+            setupButton('howToPlayBtn', () => toggleInfoSection('howToPlayBtn', 'howToPlayContent'));
+            setupButton('howToUseBtn', () => toggleInfoSection('howToUseBtn', 'howToUseContent'));
+            
+            updateBetDisplay();
+            startDiceRolling();
+            
+            console.log('Initialization complete');
+        });
+        
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                console.log('Page visible again, ensuring dice animation continues');
+                lastDiceRoll = Date.now() - DICE_INTERVAL;
+            }
+        });
+
+        let lastDiceRoll = 0;
+        const DICE_INTERVAL = 2500;
+        
+        function rollDice() {
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+            
+            if (!dice1 || !dice2) {
+                setTimeout(rollDice, 100);
+                return;
+            }
+            
+            const roll1 = Math.floor(Math.random() * 6) + 1;
+            const roll2 = Math.floor(Math.random() * 6) + 1;
+            
+            dice1.className = 'dice-icon dice-face-' + roll1;
+            dice2.className = 'dice-icon dice-face-' + roll2;
+            
+            dice1.style.animation = 'none';
+            dice2.style.animation = 'none';
+            
+            void dice1.offsetWidth;
+            void dice2.offsetWidth;
+            
+            dice1.style.animation = 'rollDice 3s infinite ease-in-out';
+            dice2.style.animation = 'rollDice 3s infinite ease-in-out';
+            dice2.style.animationDelay = '-1.5s';
+            
+            lastDiceRoll = Date.now();
+        }
+        
+        function startDiceRolling() {
+            console.log('Starting dice animation with interval');
+            rollDice();
+            setInterval(rollDice, DICE_INTERVAL);
+        }
+    </script>
+</body>
+</html>
