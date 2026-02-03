@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -905,6 +904,154 @@
         }
         .purple-header { color: #e9d5ff; }
         
+        /* MODE TOGGLE STYLES */
+        .mode-toggle-container {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+        }
+        @media (min-width: 768px) {
+            .mode-toggle-container {
+                padding: 20px;
+                border-radius: 16px;
+            }
+        }
+        .mode-toggle-label {
+            font-size: 14px;
+            color: #fde68a;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        @media (min-width: 768px) {
+            .mode-toggle-label { font-size: 16px; }
+        }
+        .mode-toggle-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .mode-btn {
+            padding: 12px;
+            border: 2px solid #10b981;
+            background: rgba(6, 78, 59, 0.4);
+            color: #86efac;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        @media (min-width: 768px) {
+            .mode-btn { padding: 14px; font-size: 14px; }
+        }
+        .mode-btn:hover {
+            background: rgba(6, 78, 59, 0.6);
+            transform: scale(1.02);
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            border-color: #fbbf24;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5);
+        }
+        .mode-description {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #d1fae5;
+            text-align: center;
+            line-height: 1.6;
+        }
+        @media (min-width: 768px) {
+            .mode-description { font-size: 13px; }
+        }
+        
+        /* BANKROLL RECOMMENDATIONS */
+        .bankroll-recommendations {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.25) 0%, rgba(127, 29, 29, 0.3) 100%);
+            border: 3px solid #fbbf24;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 12px 48px rgba(251, 191, 36, 0.4);
+        }
+        @media (min-width: 768px) {
+            .bankroll-recommendations {
+                padding: 24px;
+                border-radius: 16px;
+            }
+        }
+        .bankroll-rec-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fde68a;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        @media (min-width: 768px) {
+            .bankroll-rec-header { font-size: 22px; margin-bottom: 20px; }
+        }
+        .bankroll-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        @media (min-width: 600px) {
+            .bankroll-grid { grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        }
+        .bankroll-option {
+            background: rgba(6, 78, 59, 0.4);
+            border: 2px solid #10b981;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        @media (min-width: 768px) {
+            .bankroll-option { padding: 18px; }
+        }
+        .bankroll-option-label {
+            font-size: 11px;
+            color: #86efac;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        @media (min-width: 768px) {
+            .bankroll-option-label { font-size: 12px; margin-bottom: 10px; }
+        }
+        .bankroll-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fde68a;
+            margin-bottom: 8px;
+        }
+        @media (min-width: 768px) {
+            .bankroll-amount { font-size: 28px; margin-bottom: 10px; }
+        }
+        .bankroll-success {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        @media (min-width: 768px) {
+            .bankroll-success { font-size: 18px; }
+        }
+        .bankroll-rolls {
+            font-size: 12px;
+            color: #93c5fd;
+        }
+        @media (min-width: 768px) {
+            .bankroll-rolls { font-size: 13px; }
+        }
+        
         .input-flex { display: flex; gap: 8px; flex-direction: column; }
         @media (min-width: 500px) {
             .input-flex { flex-direction: row; gap: 10px; }
@@ -1269,28 +1416,61 @@
             </div>
             <p style="line-height: 1.7; font-size: 13px; color: #d1fae5; text-align: center;">
                 This analyzer runs <strong>10,000 Monte Carlo simulations</strong> to determine the <strong style="color: #fbbf24;">optimal number of rolls</strong> 
-                you should play before cashing out in Crapless Craps. Set your bankroll, choose a betting strategy, 
-                and discover exactly when to walk away to maximize your chances of hitting your profit target. 
-                The <strong style="color: #fbbf24;">Press Profit</strong> strategy automatically increases bets after wins to accelerate toward your goal.
+                you should play before cashing out in Crapless Craps. Choose between <strong style="color: #fbbf24;">Standard Mode</strong> 
+                (enter bankroll + target) or <strong style="color: #fbbf24;">Reverse Calculator</strong> (find required bankroll for your target profit).
                 After playing, use the Post-Session Analysis to see how your actual rolls performed and how rare they were.
             </p>
+        </div>
+        
+        <!-- MODE TOGGLE -->
+        <div class="mode-toggle-container">
+            <div class="mode-toggle-label">🔄 Calculator Mode</div>
+            <div class="mode-toggle-buttons">
+                <div class="mode-btn active" id="standardModeBtn">
+                    📊 Standard<br>
+                    <span style="font-size: 11px; font-weight: normal; opacity: 0.8;">Enter Bankroll and Profit Target</span>
+                </div>
+                <div class="mode-btn" id="reverseModeBtn">
+                    🎯 Reverse Calculator<br>
+                    <span style="font-size: 11px; font-weight: normal; opacity: 0.8;">Enter Profit Target, Find your bankroll</span>
+                </div>
+            </div>
+            <div class="mode-description" id="modeDescription">
+                Standard Mode: Enter your bankroll and target profit to find the optimal number of rolls.
+            </div>
         </div>
 
         <div class="card">
             <div class="card-header">
                 <span class="dice-small dice-2"><span class="dot"></span><span class="dot"></span></span> SESSION SETUP
             </div>
-            <div class="section-instruction">
+            <div class="section-instruction" id="sessionInstruction">
                 Set your session bankroll, target profit goal, and choose a betting strategy. The strategy determines how your bankroll is distributed across the 10 numbers (2-12). Click 'Run Simulations' to find the optimal number of rolls before cashing out.
             </div>
-            <div class="input-group">
-                <label>💰 Total Bankroll Per Session ($)</label>
-                <input type="number" id="bankroll" value="250" min="50" step="50">
+            
+            <!-- Standard Mode Inputs -->
+            <div id="standardModeInputs">
+                <div class="input-group">
+                    <label>💰 Total Bankroll Per Session ($)</label>
+                    <input type="number" id="bankroll" value="250" min="50" step="50">
+                </div>
+                <div class="input-group">
+                    <label>🎯 Target Profit ($)</label>
+                    <input type="number" id="targetProfit" value="100" min="10" step="10">
+                </div>
             </div>
-            <div class="input-group">
-                <label>🎯 Target Profit ($)</label>
-                <input type="number" id="targetProfit" value="100" min="10" step="10">
+            
+            <!-- Reverse Mode Inputs -->
+            <div id="reverseModeInputs" class="hidden">
+                <div class="input-group">
+                    <label>🎯 Target Profit ($)</label>
+                    <input type="number" id="targetProfitReverse" value="100" min="10" step="10">
+                </div>
+                <div class="section-instruction" style="background: rgba(251, 191, 36, 0.1); border-color: #fbbf24;">
+                    The calculator will run simulations with different bankroll levels to show you what bankroll amounts give you different probabilities of hitting your target profit.
+                </div>
             </div>
+
             <div class="input-group">
                 <label>📊 Betting Strategy</label>
                 <select id="strategy">
@@ -1391,6 +1571,8 @@
         </div>
 
         <div id="optimalSection"></div>
+         <!-- BANKROLL RECOMMENDATIONS (for reverse mode) -->
+        <div id="bankrollRecommendations" class="bankroll-recommendations hidden"></div>
         <div id="resultsSection"></div>
 
         <div class="card purple-card">
@@ -1466,6 +1648,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Paywall engine — must execute before the app script -->
+    <script src="./paywall.js"></script>
 
     <script>
         const strategyData = {
@@ -1651,8 +1836,17 @@
         }
 
         let isProcessing = false;
+        let currentMode = 'standard';
         
         function runSimulation() {
+            // ── PAYWALL GATE: decrement free-sim counter or show modal ──
+            if (window.CrapsPaywall && !window.CrapsPaywall.attemptSimulation()) return;
+
+            console.log('Running simulation...');
+            if (currentMode === 'reverse') {
+                runReverseSimulation();
+                return;
+            }
             console.log('Running simulation...');
             const bankroll = parseFloat(document.getElementById('bankroll').value);
             const target = parseFloat(document.getElementById('targetProfit').value);
@@ -1787,7 +1981,138 @@
             tableHTML += '</tbody></table></div></div>';
             document.getElementById('resultsSection').innerHTML = tableHTML;
         }
-
+        function runReverseSimulation() {
+            if (isProcessing) return;
+            isProcessing = true;
+            
+            const targetProfit = parseFloat(document.getElementById('targetProfitReverse').value);
+            const strategy = document.getElementById('strategy').value;
+            const usePressing = strategy === 'pressProfit';
+            const pressPercent = usePressing ? parseFloat(document.getElementById('pressPercent').value) : 50;
+            
+            if (!targetProfit || targetProfit <= 0) {
+                document.getElementById('bankrollRecommendations').innerHTML = '<div class="error">Please enter a valid target profit amount.</div>';
+                document.getElementById('bankrollRecommendations').classList.remove('hidden');
+                isProcessing = false;
+                return;
+            }
+            
+            // Show loading spinner
+            document.getElementById('loadingSection').classList.add('show');
+            document.getElementById('optimalSection').innerHTML = '';
+            document.getElementById('resultsSection').innerHTML = '';
+            document.getElementById('bankrollRecommendations').classList.add('hidden');
+            
+            // Auto-scroll to loading section
+            setTimeout(() => {
+                document.getElementById('loadingSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            
+            setTimeout(() => {
+                const bankrollLevels = [
+                    targetProfit * 1.5,
+                    targetProfit * 2,
+                    targetProfit * 2.5,
+                    targetProfit * 3,
+                    targetProfit * 4,
+                    targetProfit * 5
+                ];
+                
+                const results = bankrollLevels.map(bankroll => {
+                    const bets = calculateBets(bankroll, strategy);
+                    let successfulSessions = 0;
+                    let totalOptimalRolls = 0;
+                    
+                    // Try different session lengths and find best success rate
+                    for (let sessionLen = 1; sessionLen <= 15; sessionLen++) {
+                        let wins = 0;
+                        
+                        for (let i = 0; i < 1000; i++) {
+                            const profit = simulateSession(sessionLen, bets, usePressing, pressPercent);
+                            if (profit >= targetProfit) {
+                                wins++;
+                            }
+                        }
+                        
+                        // Track the best performing session length for this bankroll
+                        if (wins > successfulSessions) {
+                            successfulSessions = wins;
+                            totalOptimalRolls = sessionLen * wins;
+                        }
+                    }
+                    
+                    const successRate = (successfulSessions / 1000) * 100;
+                    const avgOptimalRolls = successfulSessions > 0 ? Math.round(totalOptimalRolls / successfulSessions) : 0;
+                    
+                    return {
+                        bankroll: bankroll,
+                        successRate: successRate,
+                        avgOptimalRolls: avgOptimalRolls
+                    };
+                });
+                
+                let recommendationsHTML = `
+                    <div class="bankroll-rec-header">💰 BANKROLL RECOMMENDATIONS</div>
+                    <div style="text-align: center; margin-bottom: 20px; font-size: 13px; color: #d1fae5;">
+                        Based on 10,000 simulations per bankroll level for your $${targetProfit.toFixed(2)} target profit
+                    </div>
+                    <div class="bankroll-grid">
+                `;
+                
+                results.forEach(result => {
+                    let label = '';
+                    if (result.successRate >= 70) label = '✅ STRONG';
+                    else if (result.successRate >= 50) label = '👍 GOOD';
+                    else if (result.successRate >= 30) label = '⚠️ RISKY';
+                    else label = '❌ DIFFICULT';
+                    
+                    recommendationsHTML += `
+                        <div class="bankroll-option">
+                            <div class="bankroll-option-label">${label}</div>
+                            <div class="bankroll-amount">$${result.bankroll.toFixed(0)}</div>
+                            <div class="bankroll-success">${result.successRate.toFixed(1)}% Success</div>
+                            <div class="bankroll-rolls">${result.avgOptimalRolls} avg rolls</div>
+                        </div>
+                    `;
+                });
+                
+                recommendationsHTML += `
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border: 1px solid #3b82f6;">
+                        <div style="font-size: 12px; color: #93c5fd; margin-bottom: 8px; font-weight: bold;">💡 INTERPRETATION</div>
+                        <div style="font-size: 11px; color: #bfdbfe; line-height: 1.6;">
+                            <strong>Success Rate</strong> shows how often you'll hit your $${targetProfit.toFixed(2)} target with each bankroll level. 
+                            Higher bankrolls give you more cushion to survive losing streaks. The <strong>avg rolls</strong> indicates how many 
+                            rolls it typically takes to reach your target when successful. Choose based on your risk tolerance.
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('bankrollRecommendations').innerHTML = recommendationsHTML;
+                
+                
+                // Hide loading spinner
+                document.getElementById('loadingSection').classList.remove('show');
+                
+                // Auto-scroll to results
+                setTimeout(() => {
+                    document.getElementById('bankrollRecommendations').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+                document.getElementById('bankrollRecommendations').classList.remove('hidden');
+                
+                // Hide loading spinner
+                document.getElementById('loadingSection').classList.remove('show');
+                
+                // Auto-scroll to results
+                setTimeout(() => {
+                    document.getElementById('bankrollRecommendations').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+                setTimeout(() => { isProcessing = false; }, 300);
+            }, 1000);
+        }
+        
         function analyzeRolls() {
             if (isProcessing) return;
             isProcessing = true;
@@ -2013,6 +2338,36 @@
             
             setupButton('runSimBtn', runSimulation);
             setupButton('analyzeBtn', analyzeRolls);
+            // Setup mode toggle buttons
+            setupButton('standardModeBtn', function() {
+                if (currentMode !== 'standard') {
+                    currentMode = 'standard';
+                    document.getElementById('standardModeBtn').classList.add('active');
+                    document.getElementById('reverseModeBtn').classList.remove('active');
+                    document.getElementById('standardModeInputs').classList.remove('hidden');
+                    document.getElementById('reverseModeInputs').classList.add('hidden');
+                    document.getElementById('bankrollRecommendations').classList.add('hidden');
+                    document.getElementById('optimalSection').innerHTML = '';
+                    document.getElementById('resultsSection').innerHTML = '';
+                    document.getElementById('modeDescription').textContent = 'Standard Mode: Enter your bankroll and target profit to find the optimal number of rolls.';
+                    document.getElementById('sessionInstruction').textContent = 'Set your session bankroll, target profit goal, and choose a betting strategy. The strategy determines how your bankroll is distributed across the 10 numbers (2-12). Click \'Run Simulations\' to find the optimal number of rolls before cashing out.';
+                }
+            });
+            
+            setupButton('reverseModeBtn', function() {
+                if (currentMode !== 'reverse') {
+                    currentMode = 'reverse';
+                    document.getElementById('reverseModeBtn').classList.add('active');
+                    document.getElementById('standardModeBtn').classList.remove('active');
+                    document.getElementById('standardModeInputs').classList.add('hidden');
+                    document.getElementById('reverseModeInputs').classList.remove('hidden');
+                    document.getElementById('optimalSection').innerHTML = '';
+                    document.getElementById('resultsSection').innerHTML = '';
+                    document.getElementById('bankrollRecommendations').classList.add('hidden');
+                    document.getElementById('modeDescription').textContent = 'Reverse Calculator: Enter your target profit and discover what bankroll levels give you different success probabilities.';
+                    document.getElementById('sessionInstruction').textContent = 'Set your target profit goal and choose a betting strategy. The calculator will determine what bankroll amounts you need for different probability levels of hitting your target.';
+                }
+            });
             
             // Setup info buttons
             setupButton('howToPlayBtn', () => toggleInfoSection('howToPlayBtn', 'howToPlayContent'));
