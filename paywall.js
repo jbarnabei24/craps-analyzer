@@ -428,13 +428,13 @@
     document.getElementById('paywall-modal-overlay').addEventListener('click', function (e) {
       if (e.target === e.currentTarget) { hideModal(); hideSuccess(); }
     });
-    document.getElementById('pw-pro-btn').addEventListener('click', function () { CrapsPaywall.initiatePayment('pro'); });
-    document.getElementById('pw-lifetime-btn').addEventListener('click', function () { CrapsPaywall.initiatePayment('lifetime'); });
+    document.getElementById('pw-pro-btn').addEventListener('click', function () { window.CrapsPaywall.initiatePayment('pro'); });
+    document.getElementById('pw-lifetime-btn').addEventListener('click', function () { window.CrapsPaywall.initiatePayment('lifetime'); });
     document.getElementById('pw-key-submit').addEventListener('click', function () {
-      CrapsPaywall.activateByKey(document.getElementById('pw-key-input').value);
+      window.CrapsPaywall.activateByKey(document.getElementById('pw-key-input').value);
     });
     document.getElementById('pw-key-input').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') CrapsPaywall.activateByKey(this.value);
+      if (e.key === 'Enter') window.CrapsPaywall.activateByKey(this.value);
     });
 
     /* initial render */
