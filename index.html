@@ -1580,17 +1580,115 @@
                 <span class="dice-small dice-4" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span> HOW LUCKY WAS YOUR ROLL?
             </div>
             <p style="font-size: 13px; color: #e9d5ff; margin-bottom: 10px;">
-                Enter the rolls you just had (excluding 7s). Example: 6,8,4,11,6
+                Click the numbers as you roll them on the bubble craps machine!
             </p>
             <div class="section-instruction" style="background: rgba(168, 85, 247, 0.1); border-color: #a855f7; color: #c4b5fd;">
-                After playing, enter the numbers that rolled (comma-separated, no 7s). This will calculate your actual profit and show how rare your sequence was compared to everyday events. If you used Press Profit, select it in the strategy dropdown above first.
+                Track your session by tapping each number as it appears. Hit "7" when you seven out, or "ANALYZE" to see your luck stats. Press "RESET" to start over.
             </div>
-            <div class="input-flex">
-                <input type="text" id="historicalRolls" placeholder="e.g., 6,8,4,11,6,3,12">
-                <button id="analyzeBtn" type="button" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); color: #fff;">ANALYZE</button>
+            
+            <!-- Craps Table Display -->
+            <div style="background: #1a4d2e; border: 3px solid #2d5a3d; border-radius: 8px; padding: 20px; margin-bottom: 12px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);">
+                <!-- Roll Display -->
+                <div style="background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.3); padding: 12px; min-height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; border-radius: 4px;">
+                    <div id="crapsRollDisplay" style="color: #fff; font-size: 16px; font-weight: 700; text-align: center; font-family: Arial, sans-serif; letter-spacing: 2px;">
+                        <span style="color: rgba(255, 255, 255, 0.5); font-style: italic;">READY TO ROLL</span>
+                    </div>
+                </div>
+                
+                <!-- Craps Table - All Numbers 2-12 (10 buttons: 2,3,4,5,6,8,9,10,11,12) -->
+                <div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin-bottom: 12px;">
+                    <button onclick="addCrapsRoll(2)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">2</button>
+                    <button onclick="addCrapsRoll(3)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">3</button>
+                    <button onclick="addCrapsRoll(4)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">4</button>
+                    <button onclick="addCrapsRoll(5)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">5</button>
+                    <button onclick="addCrapsRoll(6)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">6</button>
+                    <button onclick="addCrapsRoll(8)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">8</button>
+                    <button onclick="addCrapsRoll(9)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">9</button>
+                    <button onclick="addCrapsRoll(10)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">10</button>
+                    <button onclick="addCrapsRoll(11)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">11</button>
+                    <button onclick="addCrapsRoll(12)" style="background: #2d6a4f; color: #fff; border: 3px solid #fff; padding: 20px 4px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.2s; text-align: center;">12</button>
+                </div>
+                
+                <!-- Control Row -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 6px;">
+                    <button onclick="removeCrapsRoll()" style="background: #2d6a4f; color: #fff; border: 3px solid #fbbf24; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;">⌫ BACK</button>
+                    <button onclick="resetCrapsRolls()" style="background: #2d6a4f; color: #fff; border: 3px solid #94a3b8; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;">🔄 RESET</button>
+                    <button onclick="sevenOut()" style="background: #2d6a4f; color: #ef4444; border: 3px solid #ef4444; padding: 12px; font-size: 16px; font-weight: 900; cursor: pointer; transition: all 0.2s; letter-spacing: 1px;">🎲 7</button>
+                </div>
             </div>
+            
+            <input type="hidden" id="historicalRolls">
+            <button id="analyzeBtn" type="button" onclick="analyzeCrapsRolls()" style="width: 100%; background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); color: #fff; padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4); transition: all 0.3s;">📊 ANALYZE MY LUCK</button>
+            
             <div id="analysisResult"></div>
         </div>
+        
+        <script>
+            let crapsRollsArray = [];
+            
+            function addCrapsRoll(num) {
+                crapsRollsArray.push(num);
+                updateCrapsDisplay();
+            }
+            
+            function removeCrapsRoll() {
+                if (crapsRollsArray.length > 0) {
+                    crapsRollsArray.pop();
+                    updateCrapsDisplay();
+                }
+            }
+            
+            function sevenOut() {
+                crapsRollsArray.push(7);
+                updateCrapsDisplay();
+            }
+            
+            function resetCrapsRolls() {
+                crapsRollsArray = [];
+                updateCrapsDisplay();
+                // Also clear the analysis results
+                const analysisResult = document.getElementById('analysisResult');
+                if (analysisResult) {
+                    analysisResult.innerHTML = '';
+                }
+            }
+            
+            function updateCrapsDisplay() {
+                const displayEl = document.getElementById('crapsRollDisplay');
+                if (crapsRollsArray.length === 0) {
+                    displayEl.innerHTML = '<span style="color: rgba(255, 255, 255, 0.5); font-style: italic;">READY TO ROLL</span>';
+                } else {
+                    displayEl.innerHTML = crapsRollsArray.join(' → ');
+                }
+                // Also update the hidden input for the existing analyze function
+                const inputField = document.getElementById('historicalRolls');
+                if (inputField) {
+                    inputField.value = crapsRollsArray.join(',');
+                }
+            }
+            
+            function analyzeCrapsRolls() {
+                // Update the hidden input field with current rolls
+                const inputField = document.getElementById('historicalRolls');
+                if (inputField) {
+                    inputField.value = crapsRollsArray.join(',');
+                }
+                
+                // Trigger the existing analyze button click
+                const analyzeBtn = document.getElementById('analyzeBtn');
+                if (analyzeBtn) {
+                    analyzeBtn.click();
+                }
+                
+                // Scroll to results after a short delay to allow content to render
+                setTimeout(() => {
+                    const analysisResult = document.getElementById('analysisResult');
+                    if (analysisResult && analysisResult.innerHTML.trim() !== '') {
+                        analysisResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 300);
+            }
+        </script>
 
         <div class="insights">
             <h2>🎯 QUICK BETTING GUIDE</h2>
