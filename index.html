@@ -1575,6 +1575,576 @@
         <div id="bankrollRecommendations" class="bankroll-recommendations hidden"></div>
         <div id="resultsSection"></div>
 
+        <!-- PRACTICE MODE SECTION -->
+        <div class="card" style="background: rgba(6, 78, 59, 0.3); border: 2px solid rgba(16, 185, 129, 0.3);">
+            <div class="card-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border-color: rgba(16, 185, 129, 0.5);">
+                <span class="dice-small dice-5"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span> 🎲 PRACTICE MODE
+            </div>
+            <p style="font-size: 13px; color: #d1fae5; margin-bottom: 10px;">
+                Practice real crapless craps! Money stays at risk once a point is established. With "Press Profit" strategy, your bets grow after each win!
+            </p>
+            <div class="section-instruction" style="background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #86efac;">
+                <strong>How it works:</strong> Come out roll places all bets. Point is established. Money stays at risk - keep rolling! Hit your numbers for winnings. <strong style="color: #fbbf24;">With Press Profit: each win increases that number's bet using your press %.</strong> Roll the point to win and get all money back. Roll 7 to lose it all. Then new come out roll starts with your current (possibly increased) bets.
+            </div>
+
+            <!-- Session Setup Button -->
+            <button id="startPracticeBtn" style="width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: 900; margin-top: 12px; margin-bottom: 16px; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);">
+                🎲 START PRACTICE SESSION
+            </button>
+
+            <!-- Practice Game Area (hidden until session starts) -->
+            <div id="practiceGameArea" class="hidden">
+                <!-- Status Display -->
+                <div style="background: rgba(0,0,0,0.3); border: 2px solid #10b981; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
+                        <div style="text-align: center; padding: 12px; background: rgba(6, 78, 59, 0.3); border-radius: 6px;">
+                            <div style="font-size: 11px; color: #86efac; margin-bottom: 4px;">BANKROLL (Available Cash)</div>
+                            <div id="practiceBankroll" style="font-size: 24px; font-weight: 900; color: #10b981;">$500</div>
+                        </div>
+                        <div style="text-align: center; padding: 12px; background: rgba(6, 78, 59, 0.3); border-radius: 6px;">
+                            <div style="font-size: 11px; color: #86efac; margin-bottom: 4px;">SESSION PROFIT (Completed Rounds)</div>
+                            <div id="practiceProfit" style="font-size: 24px; font-weight: 900; color: #fbbf24;">$0</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 6px;">
+                        <div style="font-size: 11px; color: #fca5a5; margin-bottom: 4px;">MONEY AT RISK (Currently On Table)</div>
+                        <div id="moneyAtRisk" style="font-size: 24px; font-weight: 900; color: #ef4444;">$0</div>
+                    </div>
+                </div>
+
+                <!-- Dice Rolling Area -->
+                <div style="background: #1a4d2e; border: 3px solid #2d5a3d; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);">
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 16px; min-height: 100px;">
+                        <div id="practiceDice1" class="practice-dice">
+                            <div class="dice-dot" style="top: 50%; left: 50%;"></div>
+                        </div>
+                        <div id="practiceDice2" class="practice-dice">
+                            <div class="dice-dot" style="top: 50%; left: 50%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-bottom: 12px;">
+                        <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">GAME STATUS</div>
+                        <div id="practiceGameStatus" style="font-size: 18px; font-weight: 700; color: #fbbf24;">🎲 READY - Click ROLL DICE</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-bottom: 12px;">
+                        <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">LAST ROLL</div>
+                        <div id="practiceLastRoll" style="font-size: 32px; font-weight: 900; color: #fff;">--</div>
+                    </div>
+                </div>
+
+                <!-- Current Bets Display -->
+                <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #10b981; margin-bottom: 12px; text-align: center;">
+                        YOUR BETS (Per Roll)
+                        <span id="pressingIndicator" style="display: none; color: #fbbf24; font-size: 11px; margin-left: 8px;">📈 PRESSING ACTIVE</span>
+                    </div>
+                    <div id="currentBetsDisplay" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div style="text-align: center; font-size: 14px; color: #86efac; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(16, 185, 129, 0.3);">
+                        Total Per Roll: <span id="practiceTotalBet" style="font-weight: 900; color: #10b981; font-size: 18px;">$0</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+                    <button id="rollPracticeBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: 900; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);">
+                        🎲 ROLL DICE
+                    </button>
+                    <button id="endPracticeBtn" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 16px; border: 2px solid #ef4444; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;">
+                        END
+                    </button>
+                </div>
+
+                <!-- Roll History -->
+                <div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                    <div style="font-size: 11px; color: #86efac; margin-bottom: 8px;">ROLL HISTORY</div>
+                    <div id="practiceHistory" style="font-size: 13px; color: #d1fae5; max-height: 150px; overflow-y: auto;">
+                        No rolls yet - start a session to begin!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS for Practice Mode Dice -->
+        <style>
+            .practice-dice {
+                width: 70px;
+                height: 70px;
+                background: #fff;
+                border-radius: 10px;
+                position: relative;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+                transition: transform 0.1s ease;
+            }
+            
+            .dice-dot {
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                background: #333;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+            }
+            
+            @keyframes diceRoll {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(90deg); }
+                50% { transform: rotate(180deg); }
+                75% { transform: rotate(270deg); }
+            }
+            
+            .rolling {
+                animation: diceRoll 0.5s ease-in-out;
+            }
+        </style>
+
+        <!-- Practice Mode JavaScript -->
+        <script>
+            // Practice mode state (use 'var' to avoid conflicts with strict scope)
+            var practiceBankroll = 500;
+            var practiceStartingBankroll = 500;
+            var practicePoint = null;
+            var practiceHistory = [];
+            var currentPracticeBets = {};
+            var practiceStartingBets = {}; // Store original bets for display
+            var practiceMoneyAtRisk = 0;
+            var practiceSessionActive = false;
+            var practiceUsePressing = false;
+            var practicePressPercent = 50;
+            var practiceCompletedProfit = 0; // Profit from completed rounds (hit point or seven out)
+            
+            // Start practice session using current inputs
+            function startPracticeSession() {
+                console.log('Starting practice session...');
+                
+                const bankrollInput = document.getElementById('bankroll');
+                const strategySelect = document.getElementById('strategy');
+                const pressPercentInput = document.getElementById('pressPercent');
+                
+                if (!bankrollInput || !strategySelect) {
+                    console.error('Bankroll or strategy input not found');
+                    alert('Error: Cannot find bankroll or strategy settings. Please reload the page.');
+                    return;
+                }
+                
+                const bankroll = parseFloat(bankrollInput.value);
+                const strategy = strategySelect.value;
+                
+                // Check if using press profit strategy
+                practiceUsePressing = (strategy === 'pressProfit');
+                practicePressPercent = practiceUsePressing && pressPercentInput ? parseFloat(pressPercentInput.value) : 50;
+                
+                console.log('Bankroll:', bankroll, 'Strategy:', strategy, 'Pressing:', practiceUsePressing, 'Press %:', practicePressPercent);
+                
+                if (isNaN(bankroll) || bankroll < 10) {
+                    alert('Please enter a bankroll of at least $10');
+                    return;
+                }
+                
+                // Calculate bets using main calculateBets function
+                try {
+                    currentPracticeBets = calculateBets(bankroll, strategy);
+                    // Store starting bets for reference
+                    practiceStartingBets = {};
+                    Object.keys(currentPracticeBets).forEach(k => {
+                        practiceStartingBets[k] = currentPracticeBets[k];
+                    });
+                    console.log('Calculated bets:', currentPracticeBets);
+                } catch (error) {
+                    console.error('Error calculating bets:', error);
+                    alert('Error calculating bets. Please try again.');
+                    return;
+                }
+                
+                // Validate custom bets
+                if (strategy === 'custom') {
+                    const totalBet = Object.values(currentPracticeBets).reduce((sum, bet) => sum + bet, 0);
+                    if (totalBet > bankroll) {
+                        alert('Total custom bets ($' + totalBet.toFixed(2) + ') exceed your bankroll ($' + bankroll.toFixed(2) + ')');
+                        return;
+                    }
+                }
+                
+                // Initialize practice session
+                practiceBankroll = bankroll;
+                practiceStartingBankroll = bankroll;
+                practicePoint = null;
+                practiceHistory = [];
+                practiceMoneyAtRisk = 0;
+                practiceSessionActive = true;
+                practiceCompletedProfit = 0; // Reset completed profit for new session
+                
+                // Update display
+                updatePracticeDisplay();
+                displayCurrentPracticeBets();
+                
+                // Show/hide pressing indicator
+                const pressingIndicator = document.getElementById('pressingIndicator');
+                if (pressingIndicator) {
+                    if (practiceUsePressing) {
+                        pressingIndicator.style.display = 'inline';
+                        pressingIndicator.textContent = `📈 PRESSING ${practicePressPercent}%`;
+                    } else {
+                        pressingIndicator.style.display = 'none';
+                    }
+                }
+                
+                // Show practice game area
+                const gameArea = document.getElementById('practiceGameArea');
+                if (gameArea) {
+                    gameArea.classList.remove('hidden');
+                    setTimeout(() => {
+                        gameArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
+                
+                console.log('Practice session started successfully', practiceUsePressing ? 'with pressing' : 'without pressing');
+            }
+            
+            // Display current bets
+            function displayCurrentPracticeBets() {
+                const display = document.getElementById('currentBetsDisplay');
+                if (!display) return;
+                
+                const nums = [2,3,4,5,6,8,9,10,11,12];
+                let totalBet = 0;
+                
+                display.innerHTML = nums.map(num => {
+                    const bet = currentPracticeBets[num] || 0;
+                    const startingBet = practiceStartingBets[num] || 0;
+                    totalBet += bet;
+                    const win = bet > 0 ? calculateWin(num, bet) : 0;
+                    const betType = strategyData[num].type.toUpperCase();
+                    const hasIncreased = practiceUsePressing && bet > startingBet;
+                    
+                    return `
+                        <div style="text-align: center; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 6px; border: 2px solid ${bet > 0 ? (hasIncreased ? 'rgba(251, 191, 36, 0.7)' : 'rgba(16, 185, 129, 0.5)') : 'rgba(255,255,255,0.1)'};">
+                            <div style="font-size: 16px; font-weight: 900; color: #fbbf24; margin-bottom: 4px;">${num}</div>
+                            <div style="font-size: 12px; color: ${hasIncreased ? '#fbbf24' : '#10b981'}; font-weight: 700;">$${bet.toFixed(2)}</div>
+                            ${hasIncreased ? `<div style="font-size: 9px; color: #fde68a;">↑ from $${startingBet.toFixed(2)}</div>` : ''}
+                            <div style="font-size: 10px; color: #86efac;">${betType}</div>
+                            ${bet > 0 ? `<div style="font-size: 10px; color: #d1fae5; margin-top: 2px;">Win: $${win.toFixed(2)}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                const totalBetEl = document.getElementById('practiceTotalBet');
+                if (totalBetEl) {
+                    totalBetEl.textContent = '$' + totalBet.toFixed(2);
+                }
+            }
+            
+            // Show dice face
+            function showDiceFace(diceElement, value) {
+                if (!diceElement) return;
+                
+                diceElement.innerHTML = '';
+                const positions = {
+                    1: [[50, 50]],
+                    2: [[30, 30], [70, 70]],
+                    3: [[30, 30], [50, 50], [70, 70]],
+                    4: [[30, 30], [30, 70], [70, 30], [70, 70]],
+                    5: [[30, 30], [30, 70], [50, 50], [70, 30], [70, 70]],
+                    6: [[30, 30], [30, 50], [30, 70], [70, 30], [70, 50], [70, 70]]
+                };
+                
+                positions[value].forEach(([top, left]) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'dice-dot';
+                    dot.style.top = top + '%';
+                    dot.style.left = left + '%';
+                    diceElement.appendChild(dot);
+                });
+            }
+            
+            // Roll the dice
+            function rollPracticeDice() {
+                if (!practiceSessionActive) {
+                    alert('Please start a practice session first.');
+                    return;
+                }
+                
+                const totalBet = Object.values(currentPracticeBets).reduce((sum, bet) => sum + bet, 0);
+                
+                if (totalBet === 0) {
+                    alert('No bets configured! Please start a new practice session.');
+                    return;
+                }
+                
+                // Only check bankroll on come out roll (when point is null)
+                if (practicePoint === null && totalBet > practiceBankroll) {
+                    alert('Insufficient bankroll! You need $' + totalBet.toFixed(2) + ' but only have $' + practiceBankroll.toFixed(2));
+                    return;
+                }
+                
+                // Animate dice
+                const dice1 = document.getElementById('practiceDice1');
+                const dice2 = document.getElementById('practiceDice2');
+                if (dice1) dice1.classList.add('rolling');
+                if (dice2) dice2.classList.add('rolling');
+                
+                setTimeout(() => {
+                    if (dice1) dice1.classList.remove('rolling');
+                    if (dice2) dice2.classList.remove('rolling');
+                    
+                    // Roll the dice
+                    const die1 = Math.floor(Math.random() * 6) + 1;
+                    const die2 = Math.floor(Math.random() * 6) + 1;
+                    const roll = die1 + die2;
+                    
+                    showDiceFace(dice1, die1);
+                    showDiceFace(dice2, die2);
+                    
+                    const lastRollEl = document.getElementById('practiceLastRoll');
+                    if (lastRollEl) {
+                        lastRollEl.textContent = roll;
+                    }
+                    
+                    // Process the roll
+                    processPracticeRoll(roll, totalBet);
+                }, 500);
+            }
+            
+            // Process a roll (main game logic)
+            function processPracticeRoll(roll, totalBet) {
+                let profit = 0;
+                let message = '';
+                const statusEl = document.getElementById('practiceGameStatus');
+                
+                if (practicePoint === null) {
+                    // COME OUT ROLL in Crapless Craps - all numbers establish a point
+                    practicePoint = roll;
+                    
+                    // Deduct bets from bankroll (money is now at risk)
+                    practiceBankroll -= totalBet;
+                    practiceMoneyAtRisk = totalBet;
+                    
+                    message = `Point is ${roll} - $${totalBet.toFixed(2)} at risk`;
+                    if (statusEl) {
+                        statusEl.textContent = '🎯 POINT: ' + roll + ' - Keep Rolling!';
+                        statusEl.style.color = '#fbbf24';
+                    }
+                    
+                } else {
+                    // POINT IS ESTABLISHED
+                    if (roll === 7) {
+                        // SEVEN OUT - Lose all money at risk (already deducted on come out)
+                        profit = -practiceMoneyAtRisk;
+                        
+                        // Finalize this round's loss
+                        const thisRoundProfit = practiceBankroll - practiceStartingBankroll - practiceCompletedProfit;
+                        practiceCompletedProfit += thisRoundProfit;
+                        
+                        message = `❌ SEVEN OUT! Lost $${practiceMoneyAtRisk.toFixed(2)} (Point was ${practicePoint})`;
+                        if (statusEl) {
+                            statusEl.textContent = '❌ SEVEN OUT! - Roll for new come out';
+                            statusEl.style.color = '#ef4444';
+                        }
+                        practicePoint = null;
+                        practiceMoneyAtRisk = 0;
+                        
+                    } else if (roll === practicePoint) {
+                        // POINT HIT - Winner!
+                        const betOnPoint = currentPracticeBets[roll];
+                        const winnings = betOnPoint > 0 ? calculateWin(roll, betOnPoint) : 0;
+                        
+                        // Calculate round profit: get back all money at risk plus winnings
+                        let roundProfit = practiceMoneyAtRisk + winnings;
+                        
+                        // PRESS PROFIT: Split winnings if pressing
+                        if (practiceUsePressing && winnings > 0) {
+                            const pressAmount = winnings * (practicePressPercent / 100);
+                            const keepAmount = winnings - pressAmount;
+                            
+                            // Increase bet on the point number
+                            currentPracticeBets[roll] += pressAmount;
+                            
+                            // Round profit: money at risk back + winnings kept
+                            // Note: pressed amount goes back into next round's bets
+                            roundProfit = practiceMoneyAtRisk + keepAmount;
+                            
+                            message = `🎉 POINT ${roll} HIT! Won $${winnings.toFixed(2)}, Kept $${keepAmount.toFixed(2)}, Pressed $${pressAmount.toFixed(2)} → Bet on ${roll} now $${currentPracticeBets[roll].toFixed(2)}`;
+                        } else {
+                            message = `🎉 POINT ${roll} HIT! Won $${winnings.toFixed(2)}, Total return: $${roundProfit.toFixed(2)}`;
+                        }
+                        
+                        // Add round profit to bankroll
+                        profit = roundProfit;
+                        practiceBankroll += roundProfit;
+                        
+                        // Finalize this round's profit
+                        const thisRoundProfit = practiceBankroll - practiceStartingBankroll - practiceCompletedProfit;
+                        practiceCompletedProfit += thisRoundProfit;
+                        
+                        if (statusEl) {
+                            statusEl.textContent = '🎉 WINNER! - Roll for new come out';
+                            statusEl.style.color = '#10b981';
+                        }
+                        
+                        practicePoint = null;
+                        practiceMoneyAtRisk = 0;
+                        
+                        // Update display to show new bet amounts if pressing
+                        if (practiceUsePressing) {
+                            displayCurrentPracticeBets();
+                        }
+                        
+                    } else {
+                        // OTHER NUMBER (not point, not 7)
+                        // Money stays at risk - just check for winnings on this number
+                        const betOnNumber = currentPracticeBets[roll];
+                        
+                        if (betOnNumber > 0) {
+                            const winnings = calculateWin(roll, betOnNumber);
+                            
+                            // PRESS PROFIT: Split winnings between bankroll and pressing
+                            if (practiceUsePressing) {
+                                const pressAmount = winnings * (practicePressPercent / 100);
+                                const keepAmount = winnings - pressAmount;
+                                
+                                // Keep portion goes to bankroll
+                                practiceBankroll += keepAmount;
+                                
+                                // Press portion increases bet AND money at risk
+                                currentPracticeBets[roll] += pressAmount;
+                                practiceMoneyAtRisk += pressAmount;
+                                
+                                profit = keepAmount; // Only the kept amount counts as immediate profit
+                                message = `Rolled ${roll} - Won $${winnings.toFixed(2)}! Kept $${keepAmount.toFixed(2)}, Pressed $${pressAmount.toFixed(2)} → Bet now $${currentPracticeBets[roll].toFixed(2)}, At risk now $${practiceMoneyAtRisk.toFixed(2)} (Point still ${practicePoint})`;
+                                
+                                // Update display to show new bet amounts and money at risk
+                                displayCurrentPracticeBets();
+                            } else {
+                                // No pressing - all winnings go to bankroll
+                                profit = winnings;
+                                practiceBankroll += profit;
+                                message = `Rolled ${roll} - Won $${winnings.toFixed(2)} on that number! (Point still ${practicePoint})`;
+                            }
+                        } else {
+                            profit = 0;
+                            message = `Rolled ${roll} - No bet on this number (Point still ${practicePoint})`;
+                        }
+                        
+                        // Money at risk may have increased if pressing
+                    }
+                }
+                
+                // Update display
+                updatePracticeDisplay();
+                
+                // Add to history
+                practiceHistory.unshift({
+                    roll: roll,
+                    profit: profit,
+                    message: message,
+                    point: practicePoint
+                });
+                
+                if (practiceHistory.length > 15) {
+                    practiceHistory.pop();
+                }
+                
+                updatePracticeHistory();
+                
+                // Check for broke
+                if (practiceBankroll <= 0 && practiceMoneyAtRisk === 0) {
+                    setTimeout(() => {
+                        alert('You\'re broke! Session ended. Start a new session to continue.');
+                        endPracticeSession();
+                    }, 1000);
+                }
+            }
+            
+            // Update practice display
+            function updatePracticeDisplay() {
+                const bankrollEl = document.getElementById('practiceBankroll');
+                const profitEl = document.getElementById('practiceProfit');
+                const atRiskEl = document.getElementById('moneyAtRisk');
+                
+                if (bankrollEl) {
+                    bankrollEl.textContent = '$' + practiceBankroll.toFixed(2);
+                    bankrollEl.style.color = practiceBankroll >= practiceStartingBankroll ? '#10b981' : '#ef4444';
+                }
+                
+                if (profitEl) {
+                    // Show completed profit (from finished rounds) while point is active
+                    // When no point (come out roll), show total including current bankroll change
+                    let displayProfit;
+                    if (practicePoint === null) {
+                        // No active point - show total profit
+                        displayProfit = practiceBankroll - practiceStartingBankroll;
+                    } else {
+                        // Point is active - show only completed profit (pending current round)
+                        displayProfit = practiceCompletedProfit;
+                    }
+                    
+                    profitEl.textContent = (displayProfit >= 0 ? '+' : '') + '$' + displayProfit.toFixed(2);
+                    profitEl.style.color = displayProfit >= 0 ? '#10b981' : '#ef4444';
+                    
+                    // Add "PENDING" indicator when point is active
+                    const pendingIndicator = practicePoint !== null ? ' (PENDING)' : '';
+                    if (practicePoint !== null && !profitEl.textContent.includes('PENDING')) {
+                        profitEl.textContent += pendingIndicator;
+                    }
+                }
+                
+                if (atRiskEl) {
+                    atRiskEl.textContent = '$' + practiceMoneyAtRisk.toFixed(2);
+                }
+            }
+            
+            // Update practice history
+            function updatePracticeHistory() {
+                const historyEl = document.getElementById('practiceHistory');
+                if (!historyEl) return;
+                
+                if (practiceHistory.length === 0) {
+                    historyEl.textContent = 'No rolls yet';
+                } else {
+                    historyEl.innerHTML = practiceHistory.map(h => {
+                        const color = h.profit >= 0 ? '#10b981' : '#ef4444';
+                        const sign = h.profit >= 0 ? '+' : '';
+                        return `<div style="margin-bottom: 6px; padding: 8px; background: rgba(0,0,0,0.3); border-left: 3px solid ${color}; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                <span style="font-weight: 700; color: #fbbf24;">Roll: ${h.roll}</span>
+                                <span style="font-weight: 700; color: ${color};">${sign}$${h.profit.toFixed(2)}</span>
+                            </div>
+                            <div style="font-size: 12px; color: #d1fae5;">${h.message}</div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+            
+            // End practice session
+            function endPracticeSession() {
+                const gameArea = document.getElementById('practiceGameArea');
+                if (gameArea) {
+                    gameArea.classList.add('hidden');
+                }
+                practicePoint = null;
+                practiceHistory = [];
+                practiceMoneyAtRisk = 0;
+                practiceSessionActive = false;
+                practiceCompletedProfit = 0;
+                
+                const historyEl = document.getElementById('practiceHistory');
+                if (historyEl) {
+                    historyEl.textContent = 'No rolls yet - start a session to begin!';
+                }
+                
+                const statusEl = document.getElementById('practiceGameStatus');
+                if (statusEl) {
+                    statusEl.textContent = '🎲 READY - Click ROLL DICE';
+                    statusEl.style.color = '#fbbf24';
+                }
+                
+                console.log('Practice session ended');
+            }
+        </script>
+
         <div class="card purple-card">
             <div class="card-header purple-header">
                 <span class="dice-small dice-4" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span> HOW LUCKY WAS YOUR ROLL?
@@ -2436,6 +3006,12 @@
             
             setupButton('runSimBtn', runSimulation);
             setupButton('analyzeBtn', analyzeRolls);
+            
+            // Setup practice mode buttons
+            setupButton('startPracticeBtn', startPracticeSession);
+            setupButton('rollPracticeBtn', rollPracticeDice);
+            setupButton('endPracticeBtn', endPracticeSession);
+            
             // Setup mode toggle buttons
             setupButton('standardModeBtn', function() {
                 if (currentMode !== 'standard') {
