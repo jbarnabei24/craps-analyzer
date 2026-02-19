@@ -91,7 +91,7 @@
           localStorage.setItem(K_KEY,  key);
           localStorage.setItem(K_TIER, data.plan);
           btnState('pw-key-submit', false, 'Activate');
-          CrapsPaywall.activateTier(data.plan);
+          window.CrapsPaywall.activateTier(data.plan);
         } else {
           btnState('pw-key-submit', false, 'Activate');
           keyError(data.error || 'Invalid or already-used key.');
@@ -222,7 +222,7 @@
 
       requestAnimationFrame(function () {
         document.getElementById('pw-done-btn').addEventListener('click', function () {
-          CrapsPaywall.activateTier(plan);
+          window.CrapsPaywall.activateTier(plan);
         });
       });
 
@@ -441,7 +441,7 @@
     refreshBadge();
 
     /* detect Stripe success redirect */
-    CrapsPaywall.checkSuccessRedirect();
+    window.CrapsPaywall.checkSuccessRedirect();
   });
 
 })(); // end CrapsPaywall
